@@ -8,5 +8,4 @@ const bookingSchema = new mongoose.Schema({
   seats: { type: Number, required: true },
 });
 
-
 module.exports = mongoose.model('Booking', bookingSchema);
