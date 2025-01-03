@@ -34,7 +34,7 @@ async function createBooking(bookingData) {
 
 
 async function getBookingsByPackageId(packageId) {
-  return await Booking.find({ packageId });
+  return await Booking.find({ packageId }).select('-_id -__v');
 }
 
 module.exports = {

@@ -35,8 +35,8 @@ describe('GET /packages', () => {
       travelPackageService.getPackageByDestination.mockResolvedValue(mockPackage);
 
       const response = await request(app).get(`/packages/${destination}`);
-
       expect(response.status).toBe(200);
+      expect(response._body.travelPackage.packageId).toBe(1);
     });
 
     it('should return 404 when package is not found', async () => {
@@ -51,6 +51,28 @@ describe('GET /packages', () => {
   });
 
   describe('POST /bookings', () => {
+    it('should add a new booking correctly', async () => {
+      const newBooking = {
+        packageId: 1,
+        customerName: 'Raj Kulkarni',
+        bookingDate: '2024-12-20',
+        seats: 2
+      };
+  
+      const mockBookingResponse = {
+        bookingId: 101,
+        ...newBooking
+      };
+  
+      bookingService.createBooking.mockResolvedValue(mockBookingResponse);
+  
+      const response = await request(app).post('/bookings').send(newBooking);
+  
+      expect(response.status).toBe(201);
+      expect(response._body.booking).toEqual(mockBookingResponse);
+      expect(response._body.booking.packageId).toBe(newBooking.packageId);
+      expect(response._body.booking.customerName).toBe(newBooking.customerName);
+    });
 
     it('should return 400 if booking data is invalid', async () => {
       const bookingData = {
@@ -67,6 +89,26 @@ describe('GET /packages', () => {
   });
 
   describe('POST /packages/seats-update', () => {
+    it('should update the available slots correctly', async () => {
+      const updateData = {
+        packageId: 1,
+        seatsBooked: 2
+      };
+    
+      const mockUpdatedPackage = {
+        packageId: 1,
+        availableSlots: 8
+      };
+    
+      travelPackageService.updateAvailableSlots.mockResolvedValue(mockUpdatedPackage);
+    
+      const response = await request(app).post('/packages/update-seats').send(updateData);
+    
+      expect(response.status).toBe(200);
+      expect(response.body.package).toEqual(mockUpdatedPackage);
+      expect(response.body.package.availableSlots).toBe(8);
+    });    
+    
 
     it('should return 404 when package to update is not found', async () => {
       const updateData = {
@@ -83,6 +125,7 @@ describe('GET /packages', () => {
   });
 
   describe('GET /bookings/:packageId', () => {
+
     it('should retrieve all bookings for a package', async () => {
       const packageId = 1;
       const mockBookings = [
@@ -95,6 +138,7 @@ describe('GET /packages', () => {
       const response = await request(app).get(`/bookings/${packageId}`);
 
       expect(response.status).toBe(200);
+      expect(response._body.bookings).toEqual(mockBookings);
     });
 
     it('should return 404 when no bookings found for a package', async () => {

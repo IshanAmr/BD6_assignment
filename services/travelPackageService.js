@@ -1,11 +1,11 @@
 const TravelPackage = require('../models/TravelPackage');
 
 async function getAllPackages() {
-  return await TravelPackage.find();
+  return await TravelPackage.find().select('-_id -__v');
 }
 
 async function getPackageByDestination(destination) {
-  return await TravelPackage.findOne({ destination });
+  return await TravelPackage.findOne({ destination }).select('-_id -__v');
 }
 
 async function updateAvailableSlots(packageId, seatsBooked) {
